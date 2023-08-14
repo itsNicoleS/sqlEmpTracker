@@ -7,41 +7,41 @@ CREATE TABLE department (
     name VARCHAR (30) NOT NULL
 );
 
-SHOW TABLE;
-
+  CREATE TABLE roles (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        title VARCHAR (50) NOT NULL,
+        salary INT NOT NULL, 
+        department_id INT,
+       FOREIGN KEY (department_id) REFERENCES department(id) ON DELETE CASCADE
+    ); 
+  
 CREATE TABLE employees
  (
     id INT PRIMARY KEY AUTO_INCREMENT,
     first_name VARCHAR (50) NOT NULL, 
     last_name VARCHAR (50) NOT NULL, 
-    department_id INT, 
-    FOREIGN KEY (department_id) REFERENCES department(id) ON DELETE SET NULL
-);
+    role_id INT, 
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+); 
 
-DESCRIBE employees; 
-
-  CREATE TABLE titles (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        title VARCHAR (50) NOT NULL,
-        salary INT NOT NULL); 
-
-        SHOW TABLE; 
-
-    ALTER TABLE employees
-     ADD COLUMN title_id INT;
-    ALTER TABLE employees
-    FOREIGN KEY (title_id) REFERNCES title(id) ON DELETE SET NULL; 
-
-SHOW TABLES;
+DESCRIBE titles;
 
 INSERT INTO department (name) VALUES
     ("Books"), 
     ("Money"), 
     ("Puppies");
-    SHOW TABLE department;
+   
+
+
+INSERT INTO roles (title, salary, department_id) VALUES
+("Manager", 100000, 1), 
+("Software Engineer", 90000, 2), 
+("Marketing", 80000, 3)
+;
+DESCRIBE roles; 
 
 INSERT INTO employees
- (first_name, last_name, department_id) VALUES
+ (first_name, last_name, role_id) VALUES
     ("JRR", "Tolkein", 1), 
     ("Rudyard", "Kipling", 1),
     ("Chuck", "Palahniuk", 1), 
@@ -49,17 +49,11 @@ INSERT INTO employees
     ("Chanel", "Choux", 3), 
     ("Captain", "Ron", 3), 
     ("Piggy", "Bank", 2), 
-    ("Underpants" "Gnomes", 2)
+    ("Underpants", "Gnomes", 2)
     ;
-SHOW TABLE employees;
+DESCRIBE roles;
 
 
-    INSERT INTO tiles (role, salary) VALUES
-    ("Manager", 100000), 
-    ("Software Engineer", 90000), 
-    ("Marketing", 80000)
-    ;
-    SHOW TABLE titles; 
 
 
     
