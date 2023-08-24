@@ -1,7 +1,9 @@
 const inquirer = require("inquirer");
+//const inquirer = import("inquirer");
 const mysql = require("mysql");
 // require("dotenv").config();
-const {AddaDepartment, addRole, addEmployee} = require ("./addThings.js")
+const { AddaDepartment, addRole, addEmployee } = require("./addThings.js");
+const { removeaDepartment, removeEmployees } = require("./removeThings.js");
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -68,68 +70,56 @@ async function mainQuestions() {
                 case "Add a Department":
                     inquirer.prompt([
                         {
-                            type:"input",
-                            name:"department",
-                            message:"input a new dep"
+                            type: "input",
+                            name: "department",
+                            message: "What is the name of the new Department?"
                         }
-                    ]).then((answer)=>{  AddaDepartment(answer);
+                    ]).then((answer) => {
+                        AddaDepartment(answer.department, connection).then(() => {
+                            mainQuestions();
+                        })
 
-                    }).then(()=>{
+                    })
+
+                    break;
+
+                case "Remove A Department":
+                    removeaDepartment(connection).then(() => {
                         mainQuestions();
                     })
-                  
+
+                    break;
+
+                case "Add an Employee":
+                    addEmployee(connection);
+                    if (err) {
+                        exitFunct(err)
+                    }
+                    else {
+                        console.table(results)
+                    };
+                    mainQuestions();
+
+                    break;
+
+                case "Remove Employee":
+                    removeEmployees(connection, mainQuestions, exitFunct);
+                    
                     // if (err) {
-                    //     console.log(err);
                     //     exitFunct(err)
                     // }
                     // else {
                     //     console.table(results)
                     // };
-                    
-                    break;
+                    // mainQuestions();
 
-                case "Remove A Department":
-                    removeaDepartment();
-                    if (err) {
-                        exitFunct(err)
-                    }
-                    else {
-                        console.table(results)
-                    };
-                  
-                    break;
-
-                case "Add an Employee":
-                    addEmployee();
-                    if (err) {
-                        exitFunct(err)
-                    }
-                    else {
-                        console.table(results)
-                    };
-                    mainQuestions();
-                    break;
-
-                case "Remove Employee":
-                    removeEmployee();
-                    if (err) {
-                        exitFunct(err)
-                    }
-                    else {
-                        console.table(results)
-                    };
-                    mainQuestions();
                     break;
 
                 case "Add a Role":
-                    addRole();
-                    if (err) {
-                        exitFunct(err)
-                    }
-                    else {
-                        console.table(results)
-                    };
-                    mainQuestions();
+                    await addRole(connection).then(() => {
+                        mainQuestions();
+                    })
+
                     break;
 
                 case "Update an Employee Role":
@@ -141,6 +131,7 @@ async function mainQuestions() {
                         console.table(results)
                     };
                     mainQuestions();
+
                     break;
 
                 case "EXIT":
@@ -207,3 +198,5 @@ function exitFunct(err) {
     process.exit(1);
 }
 mainQuestions();
+
+module.exports = { mainQuestions, exitFunct }; 

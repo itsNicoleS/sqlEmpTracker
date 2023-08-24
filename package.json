@@ -13,7 +13,8 @@
   "author": "NIcole Smith",
   "license": "MIT",
   "dependencies": {
-    "inquirer": "^8.2.4",
-    "mysql": "^2.18.1"
+    "inquirer": "^8.2.6",
+    "mysql": "^2.18.1",
+    "nodemon": "^3.0.1"
   }
 }

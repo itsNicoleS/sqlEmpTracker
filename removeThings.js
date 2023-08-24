@@ -1,54 +1,62 @@
-const { default: inquirer } = require("inquirer");
+//const { default: inquirer } = require("inquirer");
+
+
+const inquirer = require("inquirer");
+
+// const { mainQuestions, exitFunct } = require("./app.js");
 
 //remove Department 
-async function removeaDepartment() 
-    connection.query('SELECT * FROM department', (err, departments) => {
-        
+async function  removeaDepartment(connection) {
+    return await connection.query('SELECT * FROM department', (err, departments) => {
+        console.log(JSON.stringify(departments));
         inquirer.prompt([
             {
                 type: "list",
                 name: "department_id",
                 message: "Which are we removing?",
-                choices: departments.map(dep => ({ name: department.name, value: deparment.id })),
+                choices: departments.map(({id, name}) =>  ({"name": name, "value": id}) ),
             }
         ])
         .then(async (answers) => {
-            const sql = `DELETE FROM department WHERE id = ${answers.department.id}`;
-            connection.query(sql, (err, results) => {
+            const sql = `DELETE FROM department WHERE id = ${answers.department_id}`;
+            return await connection.query(sql, (err, results) => {
                 if (err) {
-                    exitFunct(err)
+                    console.log(err)
                 }
                 else {
-                    console.table(results)
+                    console.log ("deleted success!");
                 };
-                mainQuestions();
             });
         });
-}); 
+}); }
 
 //remove Employee
 
-async function removeEmployees() 
-    connection.query('SELECT * FROM employees', (err, employees) => {
+async function removeEmployees(connection, mainQuestions, exitFunct) {
+    await connection.query('SELECT * FROM employees', (err, employees) => {
         
         inquirer.prompt([
             {
                 type: "list",
                 name: "employees_id",
                 message: "Which are we removing?",
-                choices: employee.map(dep => ({ name: employee.name, value: employees.id })),
+                choices: employees.map(employee => ({ name: employee.name, value: employee.id })),
             }
         ])
         .then(async (answers) => {
-            const sql = `DELETE FROM department WHERE id = ${answers.employees.id}`;
-            connection.query(sql, (err, results) => {
+            const sql = `DELETE FROM employees WHERE id = ${answers.employees_id}`;
+            await connection.query(sql, (err, results) => {
                 if (err) {
                     exitFunct(err)
                 }
                 else {
                     console.table(results)
+                    mainQuestions();
                 };
-                mainQuestions();
-            });
+                
+            }
+           // console.log("here i am!")
+            );
         });
-}); 
+}); }
+module.exports = { removeaDepartment, removeEmployees }; 
