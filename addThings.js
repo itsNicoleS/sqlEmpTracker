@@ -2,79 +2,29 @@
 
 const inquirer = require("inquirer");
 const util = require('util');
-
-async function AddaDepartment(name, connection) {
-
-
-    // console.log(`you picked ${name}`);
-    var sql = "INSERT INTO department (name) VALUES('" + name + "')";
-    console.log(sql)
-    return connection.query(sql, (err, results) => {
-
-        if (err) {
-            exitFunct(err)
-        }
-        else {
-            console.table(results)
-            mainQuestions();
-        };
-
-    });
-
+const maine = null;
+function setMain(useMain) {
+    maine = useMain
+    console.log("setMain called")
 }
 
+async function AddaDepartment(connection) {
 
-// Add Employee
-async function addEmployee() {
-    connection.query('SELECT * from employees', (err, results) => {
+    try {
+        const { department } = await inquirer.prompt([
+            {
+                type: "input",
+                name: "department",
+                message: "What is the name of the department you want to add?",
+            }
+        ])
+        await connection.promise().query(`INSERT INTO department (name) VALUES ('${department}')`)
 
-        if (err) {
-            exitFunct(err)
-        }
-        else {
-            console.log("success!")
-        }
-    });
-
-    var questions = [
-        {
-            type: "input",
-            name: "First",
-            message: "What is the First Name?",
-
-        },
-        {
-            type: "input",
-            name: "Last",
-            message: "What is the Last Name?",
-
-        },
-        {
-            type: "list",
-            name: "Role",
-            message: "What is the Employee Role?",
-            choices: [results.Roles]
-
-        }]
-    await inquirer
-        .prompt()
-        .then(async (answers) => {
-
-            var sql = "INSERT INTO employees (name) VALUES('" + answers.Emp + "')";
-
-            connection.query(sql, (err, results) => {
-
-                if (err) {
-                    exitFunct(err)
-                }
-                else {
-                    console.table(results)
-                };
-
-                mainQuestions();
-            });
-        });
+    } catch (err) {
+        console.log(err);
+    }
 };
+
 
 //add a Role 
 
@@ -126,4 +76,39 @@ async function addRole(connection) {
 
 }
 
-module.exports = { AddaDepartment, addRole, addEmployee }; 
+//add Employee 
+async function addEmployee(connection) {
+    const [roles] = await connection.promise().query("SELECT * FROM roles");
+    try {
+        const { first_name, last_name, roles_id, } = await inquirer.prompt([
+            {
+                type: "input",
+                name: "first_name",
+                message: "What is the first name of the employee?",
+            },
+            {
+                type: "input",
+                name: "last_name",
+                message: "What is the last name of the employee?",
+            },
+            {
+                type: "list",
+                name: "roles_id",
+                message: "Please to be choose a role from list",
+                choices: roles.map(({ id, title }) => {
+                    return {
+                        value: id,
+                        name: title
+                    }
+                })
+            },])
+
+
+        await connection.promise().query(`INSERT INTO employees (first_name, last_name, role_id) VALUES ('${first_name}', '${last_name}', '${roles_id}')`);
+        console.log("employee added succesfully!")
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+module.exports = { AddaDepartment, addRole, addEmployee, setMain, }; 

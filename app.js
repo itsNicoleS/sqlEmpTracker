@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 //const inquirer = import("inquirer");
-const mysql = require("mysql");
+const mysql = require("mysql2");
+const ascii = require("ascii-art");
 // require("dotenv").config();
 const { AddaDepartment, addRole, addEmployee } = require("./addThings.js");
 const { removeaDepartment, removeEmployees } = require("./removeThings.js");
@@ -14,6 +15,8 @@ const connection = mysql.createConnection({
 })
 
 async function mainQuestions() {
+    let render = await ascii.font("Welcome!", 'doom').completed()
+    console.log(render);
     await inquirer
         .prompt([
             {
@@ -28,97 +31,63 @@ async function mainQuestions() {
             console.log(chosen)
             switch (chosen) {
                 case "View All Departments":
-                    connection.query('SELECT * from department', (err, results) => {
 
-                        if (err) {
-                            exitFunct(err)
-                        }
-                        else {
-                            console.table(results)
-                        };
-                        mainQuestions();
-                    });
+                    const [departments] = await connection.promise().query('SELECT * from department')
+                    console.table(departments);
+
+                    mainQuestions();
+
                     break;
                 case "View All Employees":
-                    connection.query('SELECT * from employees', (err, results) => {
 
-                        if (err) {
-                            exitFunct(err)
-                        }
-                        else {
-                            console.table(results)
-                        };
-                        mainQuestions();
-                    });
-                    break;
+                    const [employees] = await connection.promise().query
+                        ("SELECT employees.first_name, employees.last_name, roles.title, roles.salary, roles.department_id FROM employees, roles WHERE employees.role_id=roles.id")
+                    console.table(employees);
 
-                case "View All Roles":
-                    connection.query('SELECT * from roles', (err, results) => {
-
-                        if (err) {
-                            exitFunct(err)
-                        }
-                        else {
-                            console.table(results)
-                        };
-                        mainQuestions();
-                    });
-                    break;
-
-
-
-                case "Add a Department":
-                    inquirer.prompt([
-                        {
-                            type: "input",
-                            name: "department",
-                            message: "What is the name of the new Department?"
-                        }
-                    ]).then((answer) => {
-                        AddaDepartment(answer.department, connection).then(() => {
-                            mainQuestions();
-                        })
-
-                    })
-
-                    break;
-
-                case "Remove A Department":
-                    removeaDepartment(connection).then(() => {
-                        mainQuestions();
-                    })
-
-                    break;
-
-                case "Add an Employee":
-                    addEmployee(connection);
-                    if (err) {
-                        exitFunct(err)
-                    }
-                    else {
-                        console.table(results)
-                    };
                     mainQuestions();
 
                     break;
 
-                case "Remove Employee":
-                    removeEmployees(connection, mainQuestions, exitFunct);
-                    
-                    // if (err) {
-                    //     exitFunct(err)
-                    // }
-                    // else {
-                    //     console.table(results)
-                    // };
-                    // mainQuestions();
+                case "View All Roles":
+                    const [roles] = await connection.promise().query
+                        ("SELECT roles.title, roles.salary, department.name as department_name FROM roles, department WHERE roles.department_id= department.id")
+                    console.table(roles);
+
+                    mainQuestions();
+
+                    break;
+
+                case "Add a Department":
+                    await AddaDepartment(connection);
+                    mainQuestions();
+
+                    break;
+
+
+                case "Add an Employee":
+                    await addEmployee(connection);
+
+                    mainQuestions();
 
                     break;
 
                 case "Add a Role":
-                    await addRole(connection).then(() => {
-                        mainQuestions();
-                    })
+                    await addRole(connection)
+                    mainQuestions();
+
+                    break;
+
+                case "Remove A Department":
+                    await removeaDepartment(connection)
+                    mainQuestions();
+
+
+                    break;
+
+                case "Remove Employee":
+                    await removeEmployees(connection);
+
+                    mainQuestions();
 
                     break;
 
@@ -198,5 +167,5 @@ function exitFunct(err) {
     process.exit(1);
 }
 mainQuestions();
-
+// setMain (this);
 module.exports = { mainQuestions, exitFunct }; 
