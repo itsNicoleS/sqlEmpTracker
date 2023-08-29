@@ -17,22 +17,24 @@ const connection = mysql.createConnection({
 async function mainQuestions() {
     let render = await ascii.font("Welcome!", 'doom').completed()
     console.log(render);
-    await inquirer
-        .prompt([
+
+   while (true) {
+   const answers = await inquirer.prompt([
             {
                 type: "list",
                 name: "fart",
-                message: "select an Action:",
+                message: "Select an Action:",
                 choices: ["View All Departments", "View All Employees", "View All Roles", "Add a Department", "Remove A Department", "Add an Employee", "Remove Employee", "Add a Role", "Update an Employee Role", "EXIT"],
             },
-        ])
-        .then(async (answers) => {
-            const chosen = answers.fart;
-            console.log(chosen)
+        ]);
+        const chosen = answers.fart;
+            console.log(chosen);
+
             switch (chosen) {
                 case "View All Departments":
 
-                    const [departments] = await connection.promise().query('SELECT * from department')
+                    const [departments] = await connection.promise().query
+                    ('SELECT * from department')
                     console.table(departments);
 
                     mainQuestions();
@@ -105,13 +107,12 @@ async function mainQuestions() {
 
                 case "EXIT":
                     connection.end();
-                    console.log("Fine, exiting...");
-                    break;
+                    console.log("Goodbye!");
+                    process.exit(1);
             }
 
         }
-        );
-}
+};
 
 //update Employee Roles
 async function updateEmployeeRole() {
@@ -164,8 +165,8 @@ async function updateEmployeeRole() {
 function exitFunct(err) {
     console.error('Error', err);
     connection.end();
-    process.exit(1);
+    process.exit(0);
 }
 mainQuestions();
-// setMain (this);
+
 module.exports = { mainQuestions, exitFunct }; 
