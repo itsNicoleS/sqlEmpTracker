@@ -14,6 +14,6 @@ ME, ChatGPT
 
 ## License
 
-MIT
+MIT!
 
 ---
